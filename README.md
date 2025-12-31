@@ -11,7 +11,7 @@ Next.js starter template for Drupal JSON:API with [jsonapi_frontend](https://www
 Click the green **"Use this template"** button above, or:
 
 ```bash
-gh repo create my-site --template CodeWheel-AI/jsonapi-frontend-next
+gh repo create my-site --template code-wheel/jsonapi-frontend-next
 cd my-site
 ```
 
