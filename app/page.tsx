@@ -1,6 +1,5 @@
 import { resolvePath, fetchJsonApi } from "@/lib/drupal"
 import { EntityRenderer } from "@/components/entity"
-import { notFound } from "next/navigation"
 
 /**
  * Homepage - resolves the root path "/" from Drupal.

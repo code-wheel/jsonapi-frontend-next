@@ -4,7 +4,8 @@ import { EntityRenderer } from "@/components/entity"
 import { ViewRenderer } from "@/components/view"
 
 interface PageProps {
-  params: Promise<{ slug: string[] }>
+  params: { slug: string[] }
+  searchParams?: Record<string, string | string[] | undefined>
 }
 
 /**
@@ -39,11 +40,12 @@ const DEFAULT_INCLUDES = [
  * 4. Fetches the resource via JSON:API with media includes
  * 5. Renders with the appropriate component
  */
-export default async function Page({ params }: PageProps) {
-  const { slug } = await params
-  const path = "/" + slug.join("/")
+export default async function Page({ params, searchParams }: PageProps) {
+  const path = "/" + params.slug.join("/")
 
   try {
+    const query = searchParamsToString(searchParams)
+
     // Resolve the path to a Drupal resource
     const resolved = await resolvePath(path)
 
@@ -64,8 +66,9 @@ export default async function Page({ params }: PageProps) {
 
     // Handle views (headless)
     if (resolved.kind === "view" && resolved.data_url) {
-      const doc = await fetchView(resolved.data_url)
-      return <ViewRenderer doc={doc} />
+      const dataUrl = query ? `${resolved.data_url}?${query}` : resolved.data_url
+      const doc = await fetchView(dataUrl)
+      return <ViewRenderer doc={doc} currentPath={path} />
     }
 
     // Handle entities
@@ -107,8 +110,7 @@ export default async function Page({ params }: PageProps) {
  * Generate metadata for SEO.
  */
 export async function generateMetadata({ params }: PageProps) {
-  const { slug } = await params
-  const path = "/" + slug.join("/")
+  const path = "/" + params.slug.join("/")
 
   try {
     const resolved = await resolvePath(path)
@@ -134,4 +136,28 @@ export async function generateMetadata({ params }: PageProps) {
   } catch {
     return {}
   }
+}
+
+function searchParamsToString(
+  searchParams: Record<string, string | string[] | undefined> | undefined
+): string {
+  if (!searchParams) {
+    return ""
+  }
+
+  const params = new URLSearchParams()
+
+  for (const [key, value] of Object.entries(searchParams)) {
+    if (typeof value === "string") {
+      params.set(key, value)
+      continue
+    }
+    if (Array.isArray(value)) {
+      for (const v of value) {
+        params.append(key, v)
+      }
+    }
+  }
+
+  return params.toString()
 }

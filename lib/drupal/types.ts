@@ -11,7 +11,7 @@ export type ResolveResponse =
         id: string
         langcode: string
       }
-      redirect: null
+      redirect: { to: string; status?: number } | null
       jsonapi_url: string
       data_url: null
       /** Whether this entity type is enabled for headless rendering. */
@@ -24,7 +24,7 @@ export type ResolveResponse =
       kind: "view"
       canonical: string
       entity: null
-      redirect: null
+      redirect: { to: string; status?: number } | null
       jsonapi_url: null
       data_url: string
       /** Whether this View is enabled for headless rendering. */
@@ -37,7 +37,7 @@ export type ResolveResponse =
       kind: null
       canonical: null
       entity: null
-      redirect: null
+      redirect: { to: string; status?: number } | null
       jsonapi_url: null
       data_url: null
       headless: false

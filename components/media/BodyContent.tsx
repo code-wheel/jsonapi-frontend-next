@@ -6,7 +6,6 @@ import { JsonApiResource } from "@/lib/drupal/types"
 import {
   extractMedia,
   extractEmbeddedMediaUuids,
-  findIncluded,
   DrupalMediaData,
 } from "@/lib/drupal/media"
 import { resolveFileUrl } from "@/lib/drupal/url"
@@ -181,7 +180,7 @@ function renderWithEmbeddedMedia(
   imagePreset: "full" | "thumbnail" | "medium" | "large" | "hero"
 ): React.ReactNode[] {
   // Split by drupal-media tags
-  const parts = html.split(/(<drupal-media[^>]*>.*?<\/drupal-media>)/gs)
+  const parts = html.split(/(<drupal-media[^>]*>[\s\S]*?<\/drupal-media>)/g)
 
   return parts.map((part, index) => {
     // Check if this part is a drupal-media tag

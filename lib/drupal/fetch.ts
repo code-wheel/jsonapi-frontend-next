@@ -127,7 +127,13 @@ export async function fetchJsonApi<T = JsonApiDocument>(
 export async function fetchView<T = JsonApiDocument>(
   dataUrl: string,
   options?: {
-    page?: number
+    /**
+     * JSON:API pagination parameters.
+     *
+     * - number: sets page[offset]
+     * - object: sets page[offset] and/or page[limit]
+     */
+    page?: number | { offset?: number; limit?: number }
     revalidate?: number
     /** Additional cache tags to include */
     tags?: string[]
@@ -140,9 +146,18 @@ export async function fetchView<T = JsonApiDocument>(
 
   const url = new URL(dataUrl, base)
 
-  // Add pagination if specified
+  // Add pagination if specified.
   if (options?.page !== undefined) {
-    url.searchParams.set("page", String(options.page))
+    if (typeof options.page === "number") {
+      url.searchParams.set("page[offset]", String(options.page))
+    } else {
+      if (options.page.offset !== undefined) {
+        url.searchParams.set("page[offset]", String(options.page.offset))
+      }
+      if (options.page.limit !== undefined) {
+        url.searchParams.set("page[limit]", String(options.page.limit))
+      }
+    }
   }
 
   // Build cache tags

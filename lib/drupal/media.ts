@@ -3,7 +3,7 @@
  */
 
 import { JsonApiResource, JsonApiRelationship } from "./types"
-import { getFileUrl, resolveFileUrl } from "./url"
+import { getFileUrl } from "./url"
 
 /**
  * Extracted image data ready for rendering.
@@ -104,6 +104,21 @@ export function extractImageFromFile(
   }
 }
 
+function getRelationshipMetaString(
+  relationship: JsonApiRelationship | undefined,
+  key: string
+): string | undefined {
+  const data = relationship?.data
+  if (!data || Array.isArray(data)) {
+    return undefined
+  }
+
+  const meta = (data as { meta?: Record<string, unknown> }).meta
+  const value = meta?.[key]
+
+  return typeof value === "string" && value.trim() !== "" ? value : undefined
+}
+
 /**
  * Extract media data from a media entity.
  *
@@ -154,9 +169,13 @@ export function extractMedia(
         const imageData = extractImageFromFile(file)
         if (imageData) {
           result.url = imageData.src
+          const alt = getRelationshipMetaString(fileRelationship, "alt")
+          const title = getRelationshipMetaString(fileRelationship, "title")
+
           result.image = {
             ...imageData,
-            alt: (attrs?.field_media_image?.alt as string) || imageData.alt || name,
+            alt: alt || imageData.alt || name,
+            title: title || imageData.title,
           }
         }
       }

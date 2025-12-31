@@ -73,20 +73,14 @@ function ViewItem({ item }: { item: JsonApiResource }) {
 }
 
 /**
- * Extract page number from JSON:API pagination URL.
- * JSON:API uses `page[offset]` parameter for pagination.
+ * Extract query string from JSON:API pagination URL.
  */
-function extractPageFromUrl(url: string): number | null {
+function extractSearchFromUrl(url: string): string {
   try {
     const urlObj = new URL(url, "http://dummy")
-    const offset = urlObj.searchParams.get("page[offset]")
-    if (offset) {
-      // JSON:API offset / items per page (assuming 10 per page)
-      return Math.floor(parseInt(offset, 10) / 10) + 1
-    }
-    return null
+    return urlObj.search
   } catch {
-    return null
+    return ""
   }
 }
 
@@ -104,13 +98,13 @@ function ViewPagination({
 
   if (!nextUrl && !prevUrl) return null
 
-  const nextPage = nextUrl ? extractPageFromUrl(nextUrl) : null
-  const prevPage = prevUrl ? extractPageFromUrl(prevUrl) : null
-
-  // Build frontend pagination URLs using query parameters
   const basePath = currentPath || ""
-  const prevHref = prevPage ? `${basePath}?page=${prevPage}` : null
-  const nextHref = nextPage ? `${basePath}?page=${nextPage}` : null
+
+  const prevSearch = prevUrl ? extractSearchFromUrl(prevUrl) : ""
+  const nextSearch = nextUrl ? extractSearchFromUrl(nextUrl) : ""
+
+  const prevHref = prevSearch ? `${basePath}${prevSearch}` : null
+  const nextHref = nextSearch ? `${basePath}${nextSearch}` : null
 
   return (
     <nav

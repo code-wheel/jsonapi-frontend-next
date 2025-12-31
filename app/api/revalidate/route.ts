@@ -101,10 +101,12 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  console.log(
-    `[Revalidate] ${operation} - Revalidated ${revalidated.tags.length} tags, ${revalidated.paths.length} paths`,
-    entity ? `(${entity.type}/${entity.bundle}/${entity.uuid})` : ""
-  )
+  if (process.env.NODE_ENV !== "production") {
+    console.warn(
+      `[Revalidate] ${operation} - Revalidated ${revalidated.tags.length} tags, ${revalidated.paths.length} paths`,
+      entity ? `(${entity.type}/${entity.bundle}/${entity.uuid})` : ""
+    )
+  }
 
   return NextResponse.json({
     revalidated: true,
