@@ -25,6 +25,13 @@ interface RevalidatePayload {
   timestamp: number
 }
 
+function serializeError(error: unknown): { message: string; name?: string; stack?: string } {
+  if (error instanceof Error) {
+    return { name: error.name, message: error.message, stack: error.stack }
+  }
+  return { message: String(error) }
+}
+
 /**
  * Securely compare two strings using timing-safe comparison.
  */
@@ -87,7 +94,11 @@ export async function POST(request: NextRequest) {
       revalidateTag(tag, "max")
       revalidated.tags.push(tag)
     } catch (error) {
-      console.error("[Revalidate] Failed to revalidate tag:", tag, error)
+      console.error({
+        message: "[Revalidate] Failed to revalidate tag",
+        tag,
+        error: serializeError(error),
+      })
     }
   }
 
@@ -97,12 +108,17 @@ export async function POST(request: NextRequest) {
       revalidatePath(path)
       revalidated.paths.push(path)
     } catch (error) {
-      console.error("[Revalidate] Failed to revalidate path:", path, error)
+      console.error({
+        message: "[Revalidate] Failed to revalidate path",
+        path,
+        error: serializeError(error),
+      })
     }
   }
 
   if (process.env.NODE_ENV !== "production") {
-    console.warn("[Revalidate] Revalidated", {
+    console.warn({
+      message: "[Revalidate] Revalidated",
       operation,
       tags: revalidated.tags.length,
       paths: revalidated.paths.length,

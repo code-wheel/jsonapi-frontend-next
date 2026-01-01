@@ -172,16 +172,26 @@ async function proxyToDrupal(request: NextRequest, path: string): Promise<NextRe
     return NextResponse.next()
   }
 
-  // Build the proxied URL safely (avoid protocol-relative / absolute URL SSRF via `path`)
+  // Build the proxied URL safely.
+  // SECURITY: `path` is user-controlled. Ensure we never let it affect the origin (SSRF prevention).
   const drupalOriginUrl = new URL(drupalOrigin)
   if (drupalOriginUrl.protocol !== "http:" && drupalOriginUrl.protocol !== "https:") {
     console.error("[jsonapi_frontend] DRUPAL_ORIGIN_URL must be http(s)")
     return NextResponse.next()
   }
 
-  const targetUrl = new URL(drupalOriginUrl.toString())
+  if (!path.startsWith("/")) {
+    return NextResponse.next()
+  }
+
+  const targetUrl = new URL(drupalOriginUrl.origin)
   targetUrl.pathname = path
   targetUrl.search = request.nextUrl.search
+
+  if (targetUrl.origin !== drupalOriginUrl.origin) {
+    console.error("[jsonapi_frontend] Refusing to proxy to unexpected origin")
+    return NextResponse.next()
+  }
 
   // Build headers to forward
   const headers = new Headers()
