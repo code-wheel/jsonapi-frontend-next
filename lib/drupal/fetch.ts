@@ -1,4 +1,5 @@
 import { JsonApiDocument } from "./types"
+import { getDrupalAuthHeaders } from "./auth"
 
 /**
  * Extract cache tags from a JSON:API path.
@@ -98,15 +99,24 @@ export async function fetchJsonApi<T = JsonApiDocument>(
     ...(options?.tags || []),
   ]
 
-  const res = await fetch(url.toString(), {
-    next: {
-      revalidate: options?.revalidate ?? 60,
-      tags,
-    },
-    headers: {
-      Accept: "application/vnd.api+json",
-    },
-  })
+  const authHeaders = getDrupalAuthHeaders()
+  const headers = {
+    Accept: "application/vnd.api+json",
+    ...(authHeaders ?? {}),
+  }
+
+  const res = await fetch(
+    url.toString(),
+    authHeaders
+      ? { cache: "no-store", headers }
+      : {
+          next: {
+            revalidate: options?.revalidate ?? 60,
+            tags,
+          },
+          headers,
+        }
+  )
 
   if (!res.ok) {
     throw new Error(`JSON:API fetch failed: ${res.status} ${res.statusText}`)
@@ -166,15 +176,24 @@ export async function fetchView<T = JsonApiDocument>(
     ...(options?.tags || []),
   ]
 
-  const res = await fetch(url.toString(), {
-    next: {
-      revalidate: options?.revalidate ?? 60,
-      tags,
-    },
-    headers: {
-      Accept: "application/vnd.api+json",
-    },
-  })
+  const authHeaders = getDrupalAuthHeaders()
+  const headers = {
+    Accept: "application/vnd.api+json",
+    ...(authHeaders ?? {}),
+  }
+
+  const res = await fetch(
+    url.toString(),
+    authHeaders
+      ? { cache: "no-store", headers }
+      : {
+          next: {
+            revalidate: options?.revalidate ?? 60,
+            tags,
+          },
+          headers,
+        }
+  )
 
   if (!res.ok) {
     throw new Error(`View fetch failed: ${res.status} ${res.statusText}`)

@@ -1,4 +1,5 @@
 import { ResolveResponse } from "./types"
+import { getDrupalAuthHeaders } from "./auth"
 
 /**
  * Resolve a frontend path to a Drupal resource.
@@ -23,12 +24,18 @@ export async function resolvePath(
     url.searchParams.set("langcode", langcode)
   }
 
-  const res = await fetch(url.toString(), {
-    next: { revalidate: 60 },
-    headers: {
-      Accept: "application/vnd.api+json",
-    },
-  })
+  const authHeaders = getDrupalAuthHeaders()
+  const headers = {
+    Accept: "application/vnd.api+json",
+    ...(authHeaders ?? {}),
+  }
+
+  const res = await fetch(
+    url.toString(),
+    authHeaders
+      ? { cache: "no-store", headers }
+      : { next: { revalidate: 60 }, headers }
+  )
 
   if (!res.ok) {
     throw new Error(`Resolver failed: ${res.status} ${res.statusText}`)
