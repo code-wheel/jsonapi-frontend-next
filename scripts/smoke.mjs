@@ -21,8 +21,7 @@ async function run(cmd, args, options = {}) {
 
 async function waitForHttpOk(url, timeoutMs = 20000) {
   const deadline = Date.now() + timeoutMs
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
+  for (;;) {
     try {
       const res = await fetch(url, { redirect: "manual" })
       if (res.ok || (res.status >= 300 && res.status < 500)) {
@@ -81,7 +80,7 @@ async function fetchText(url, init) {
 async function scenarioSplitRouting(mock) {
   const baseUrl = mock.baseUrl
   mock.requests.length = 0
-  console.log("\n[smoke] Next.js split_routing")
+  console.warn("\n[smoke] Next.js split_routing")
   const env = {
     NEXT_TELEMETRY_DISABLED: "1",
     DEPLOYMENT_MODE: "split_routing",
@@ -133,7 +132,7 @@ async function scenarioFrontendFirst(mock) {
   const baseUrl = mock.baseUrl
   const proxySecret = mock.proxySecret
   mock.requests.length = 0
-  console.log("\n[smoke] Next.js nextjs_first")
+  console.warn("\n[smoke] Next.js nextjs_first")
   const env = {
     NEXT_TELEMETRY_DISABLED: "1",
     DEPLOYMENT_MODE: "nextjs_first",
@@ -179,7 +178,7 @@ const mock = await startMockDrupal()
 try {
   await scenarioSplitRouting(mock)
   await scenarioFrontendFirst(mock)
-  console.log("\n[smoke] OK")
+  console.warn("\n[smoke] OK")
 } finally {
   await mock.close()
 }
