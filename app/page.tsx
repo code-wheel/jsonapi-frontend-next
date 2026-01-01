@@ -8,25 +8,24 @@ import { EntityRenderer } from "@/components/entity"
  * Otherwise, you can customize this page directly.
  */
 export default async function HomePage() {
-  try {
-    const resolved = await resolvePath("/")
-
-    if (!resolved.resolved) {
-      // No front page configured in Drupal - show a welcome message
-      return <WelcomePage />
-    }
-
-    if (resolved.kind === "entity" && resolved.jsonapi_url) {
-      const doc = await fetchJsonApi(resolved.jsonapi_url)
-      return <EntityRenderer doc={doc} />
-    }
-
-    // For views or other types on the homepage, customize as needed
-    return <WelcomePage />
-  } catch {
-    // If Drupal is not reachable, show welcome page
+  if (!process.env.DRUPAL_BASE_URL) {
     return <WelcomePage />
   }
+
+  const resolved = await resolvePath("/")
+
+  if (!resolved.resolved) {
+    // No front page configured in Drupal - show a welcome message
+    return <WelcomePage />
+  }
+
+  if (resolved.kind === "entity" && resolved.jsonapi_url) {
+    const doc = await fetchJsonApi(resolved.jsonapi_url)
+    return <EntityRenderer doc={doc} />
+  }
+
+  // For views or other types on the homepage, customize as needed
+  return <WelcomePage />
 }
 
 function WelcomePage() {

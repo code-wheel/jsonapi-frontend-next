@@ -2,9 +2,9 @@ import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
 /**
- * Proxy middleware for Next.js First deployment mode.
+ * Proxy file for Next.js First deployment mode.
  *
- * This middleware:
+ * This proxy:
  * 1. Resolves each path via the jsonapi_frontend resolver
  * 2. For headless content: passes through to Next.js pages
  * 3. For non-headless content: proxies to Drupal origin
@@ -15,7 +15,7 @@ import type { NextRequest } from "next/server"
  * - DRUPAL_ORIGIN_URL (proxy destination, defaults to DRUPAL_BASE_URL)
  * - DRUPAL_PROXY_SECRET (required for production - origin protection)
  *
- * Default: split_routing (middleware disabled, safest for getting started)
+ * Default: split_routing (proxy disabled, safest for getting started)
  */
 
 // Paths that should always go to Drupal (never handled by Next.js)
@@ -58,7 +58,7 @@ const FORWARD_RESPONSE_HEADERS = [
   "x-drupal-dynamic-cache",
 ]
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname
 
   // Skip Next.js internal paths
@@ -165,8 +165,15 @@ async function proxyToDrupal(request: NextRequest, path: string): Promise<NextRe
     return NextResponse.next()
   }
 
-  // Build the proxied URL
-  const targetUrl = new URL(path, drupalOrigin)
+  // Build the proxied URL safely (avoid protocol-relative / absolute URL SSRF via `path`)
+  const drupalOriginUrl = new URL(drupalOrigin)
+  if (drupalOriginUrl.protocol !== "http:" && drupalOriginUrl.protocol !== "https:") {
+    console.error("[jsonapi_frontend] DRUPAL_ORIGIN_URL must be http(s)")
+    return NextResponse.next()
+  }
+
+  const targetUrl = new URL(drupalOriginUrl.toString())
+  targetUrl.pathname = path
   targetUrl.search = request.nextUrl.search
 
   // Build headers to forward
@@ -180,7 +187,13 @@ async function proxyToDrupal(request: NextRequest, path: string): Promise<NextRe
   }
 
   // Add proxy identification headers
-  headers.set("X-Forwarded-For", request.ip || request.headers.get("x-forwarded-for") || "unknown")
+  headers.set(
+    "X-Forwarded-For",
+    request.headers.get("x-forwarded-for") ||
+      request.headers.get("x-real-ip") ||
+      request.headers.get("cf-connecting-ip") ||
+      "unknown"
+  )
   headers.set("X-Forwarded-Proto", request.nextUrl.protocol.replace(":", ""))
   headers.set("X-Forwarded-Host", request.nextUrl.host)
 
@@ -267,7 +280,7 @@ function rewriteLocationHeader(location: string, drupalOrigin: string, frontendO
 }
 
 /**
- * Configure which paths the middleware runs on.
+ * Configure which paths the proxy runs on.
  */
 export const config = {
   matcher: [

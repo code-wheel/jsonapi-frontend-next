@@ -103,7 +103,7 @@ Render: <NodePage entity={...} included={...} />
 │   ├── types.ts              # TypeScript types
 │   ├── url.ts                # URL utilities
 │   └── media.ts              # Media extraction
-└── middleware.ts             # Proxy middleware (Next.js First mode)
+└── proxy.ts                  # Proxy (Next.js First mode)
 ```
 
 ## Environment Variables

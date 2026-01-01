@@ -253,11 +253,6 @@ function decodeHtmlEntities(text: string): string {
     return textarea.value
   }
 
-  // Server-side fallback
+  // Client component; keep a safe no-DOM fallback for tests/non-browser environments.
   return text
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
 }

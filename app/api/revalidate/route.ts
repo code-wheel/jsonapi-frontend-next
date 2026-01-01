@@ -84,10 +84,10 @@ export async function POST(request: NextRequest) {
   // Revalidate by cache tags (more efficient, surgical invalidation)
   for (const tag of tags) {
     try {
-      revalidateTag(tag)
+      revalidateTag(tag, "max")
       revalidated.tags.push(tag)
     } catch (error) {
-      console.error(`[Revalidate] Failed to revalidate tag "${tag}":`, error)
+      console.error("[Revalidate] Failed to revalidate tag:", tag, error)
     }
   }
 
@@ -97,15 +97,17 @@ export async function POST(request: NextRequest) {
       revalidatePath(path)
       revalidated.paths.push(path)
     } catch (error) {
-      console.error(`[Revalidate] Failed to revalidate path "${path}":`, error)
+      console.error("[Revalidate] Failed to revalidate path:", path, error)
     }
   }
 
   if (process.env.NODE_ENV !== "production") {
-    console.warn(
-      `[Revalidate] ${operation} - Revalidated ${revalidated.tags.length} tags, ${revalidated.paths.length} paths`,
-      entity ? `(${entity.type}/${entity.bundle}/${entity.uuid})` : ""
-    )
+    console.warn("[Revalidate] Revalidated", {
+      operation,
+      tags: revalidated.tags.length,
+      paths: revalidated.paths.length,
+      entity: entity ? `${entity.type}/${entity.bundle}/${entity.uuid}` : undefined,
+    })
   }
 
   return NextResponse.json({

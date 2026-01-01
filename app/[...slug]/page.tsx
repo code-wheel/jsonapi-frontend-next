@@ -42,68 +42,58 @@ const DEFAULT_INCLUDES = [
  */
 export default async function Page({ params, searchParams }: PageProps) {
   const path = "/" + params.slug.join("/")
-
-  try {
-    const query = searchParamsToString(searchParams)
-
-    // Resolve the path to a Drupal resource
-    const resolved = await resolvePath(path)
-
-    // Handle not found
-    if (!resolved.resolved) {
-      notFound()
-    }
-
-    // Handle redirects (reserved for future use)
-    if (resolved.redirect) {
-      redirect(resolved.redirect.to)
-    }
-
-    // Handle non-headless content (entities or views): redirect to Drupal
-    if (!resolved.headless && resolved.drupal_url) {
-      redirect(resolved.drupal_url)
-    }
-
-    // Handle views (headless)
-    if (resolved.kind === "view" && resolved.data_url) {
-      const dataUrl = query ? `${resolved.data_url}?${query}` : resolved.data_url
-      const doc = await fetchView(dataUrl)
-      return <ViewRenderer doc={doc} currentPath={path} />
-    }
-
-    // Handle entities
-    if (resolved.kind === "entity" && resolved.jsonapi_url) {
-      const doc = await fetchJsonApi(resolved.jsonapi_url, {
-        // Include media relationships for embedded content
-        include: DEFAULT_INCLUDES,
-      })
-      return <EntityRenderer doc={doc} />
-    }
-
-    // Fallback - should not reach here
-    notFound()
-  } catch (error) {
-    // Log error for debugging (server-side only, won't leak to client)
-    console.error(`[jsonapi_frontend] Error rendering ${path}:`, error instanceof Error ? error.message : "Unknown error")
-
-    // Return a user-friendly error page
+  const drupalBaseUrl = process.env.DRUPAL_BASE_URL
+  if (!drupalBaseUrl) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Something went wrong</h1>
-          <p className="text-gray-600 mb-8">
-            We couldn&apos;t load this page. Please try again later.
-          </p>
-          <a
-            href="/"
-            className="inline-block px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-          >
-            Go Home
-          </a>
-        </div>
-      </div>
+      <main className="max-w-3xl mx-auto px-4 py-16">
+        <h1 className="text-4xl font-bold mb-4">Drupal + Next.js</h1>
+        <p className="text-gray-700">
+          Set <code className="bg-gray-100 px-1 rounded">DRUPAL_BASE_URL</code> in{" "}
+          <code className="bg-gray-100 px-1 rounded">.env.local</code> to connect this
+          starter to your Drupal site.
+        </p>
+      </main>
     )
   }
+
+  const query = searchParamsToString(searchParams)
+
+  // Resolve the path to a Drupal resource
+  const resolved = await resolvePath(path)
+
+  // Handle not found
+  if (!resolved.resolved) {
+    notFound()
+  }
+
+  // Handle redirects (reserved for future use)
+  if (resolved.redirect) {
+    redirect(resolved.redirect.to)
+  }
+
+  // Handle non-headless content (entities or views): redirect to Drupal
+  if (!resolved.headless && resolved.drupal_url) {
+    redirect(resolved.drupal_url)
+  }
+
+  // Handle views (headless)
+  if (resolved.kind === "view" && resolved.data_url) {
+    const dataUrl = query ? `${resolved.data_url}?${query}` : resolved.data_url
+    const doc = await fetchView(dataUrl)
+    return <ViewRenderer doc={doc} currentPath={path} />
+  }
+
+  // Handle entities
+  if (resolved.kind === "entity" && resolved.jsonapi_url) {
+    const doc = await fetchJsonApi(resolved.jsonapi_url, {
+      // Include media relationships for embedded content
+      include: DEFAULT_INCLUDES,
+    })
+    return <EntityRenderer doc={doc} />
+  }
+
+  // Fallback - should not reach here
+  notFound()
 }
 
 /**
