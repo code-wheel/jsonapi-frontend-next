@@ -4,8 +4,10 @@ import { EntityRenderer } from "@/components/entity"
 import { ViewRenderer } from "@/components/view"
 
 interface PageProps {
-  params: { slug: string[] }
-  searchParams?: Record<string, string | string[] | undefined>
+  // Next.js 16+ passes `params` / `searchParams` as Promises.
+  // `await` works for both Promise and non-Promise values, so this stays compatible.
+  params: Promise<{ slug?: string[] }> | { slug?: string[] }
+  searchParams?: Promise<Record<string, string | string[] | undefined>> | Record<string, string | string[] | undefined>
 }
 
 /**
@@ -41,7 +43,8 @@ const DEFAULT_INCLUDES = [
  * 5. Renders with the appropriate component
  */
 export default async function Page({ params, searchParams }: PageProps) {
-  const path = "/" + params.slug.join("/")
+  const resolvedParams = await params
+  const path = slugToPath(resolvedParams?.slug)
   const drupalBaseUrl = process.env.DRUPAL_BASE_URL
   if (!drupalBaseUrl) {
     return (
@@ -56,7 +59,7 @@ export default async function Page({ params, searchParams }: PageProps) {
     )
   }
 
-  const query = searchParamsToString(searchParams)
+  const query = searchParamsToString(await searchParams)
 
   // Resolve the path to a Drupal resource
   const resolved = await resolvePath(path)
@@ -100,7 +103,8 @@ export default async function Page({ params, searchParams }: PageProps) {
  * Generate metadata for SEO.
  */
 export async function generateMetadata({ params }: PageProps) {
-  const path = "/" + params.slug.join("/")
+  const resolvedParams = await params
+  const path = slugToPath(resolvedParams?.slug)
 
   try {
     const resolved = await resolvePath(path)
@@ -150,4 +154,14 @@ function searchParamsToString(
   }
 
   return params.toString()
+}
+
+function slugToPath(slug: string[] | string | undefined): string {
+  if (Array.isArray(slug)) {
+    return "/" + slug.join("/")
+  }
+  if (typeof slug === "string" && slug !== "") {
+    return "/" + slug
+  }
+  return "/"
 }
