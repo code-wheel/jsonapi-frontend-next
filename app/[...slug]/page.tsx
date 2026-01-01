@@ -1,4 +1,4 @@
-import { notFound, redirect } from "next/navigation"
+import { notFound, permanentRedirect, redirect } from "next/navigation"
 import { resolvePath, fetchJsonApi, fetchView } from "@/lib/drupal"
 import { EntityRenderer } from "@/components/entity"
 import { ViewRenderer } from "@/components/view"
@@ -69,8 +69,11 @@ export default async function Page({ params, searchParams }: PageProps) {
     notFound()
   }
 
-  // Handle redirects (reserved for future use)
   if (resolved.redirect) {
+    const status = resolved.redirect.status ?? 302
+    if (status === 301 || status === 308) {
+      permanentRedirect(resolved.redirect.to)
+    }
     redirect(resolved.redirect.to)
   }
 

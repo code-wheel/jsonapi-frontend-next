@@ -25,9 +25,14 @@ export async function resolvePath(
   }
 
   const authHeaders = getDrupalAuthHeaders()
-  const headers = {
+  const headers: Record<string, string> = {
     Accept: "application/vnd.api+json",
     ...(authHeaders ?? {}),
+  }
+
+  const proxySecret = process.env.DRUPAL_PROXY_SECRET
+  if (proxySecret && proxySecret.trim() !== "") {
+    headers["X-Proxy-Secret"] = proxySecret.trim()
   }
 
   const res = await fetch(

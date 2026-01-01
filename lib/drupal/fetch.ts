@@ -100,9 +100,14 @@ export async function fetchJsonApi<T = JsonApiDocument>(
   ]
 
   const authHeaders = getDrupalAuthHeaders()
-  const headers = {
+  const headers: Record<string, string> = {
     Accept: "application/vnd.api+json",
     ...(authHeaders ?? {}),
+  }
+
+  const proxySecret = process.env.DRUPAL_PROXY_SECRET
+  if (proxySecret && proxySecret.trim() !== "") {
+    headers["X-Proxy-Secret"] = proxySecret.trim()
   }
 
   const res = await fetch(
@@ -177,9 +182,14 @@ export async function fetchView<T = JsonApiDocument>(
   ]
 
   const authHeaders = getDrupalAuthHeaders()
-  const headers = {
+  const headers: Record<string, string> = {
     Accept: "application/vnd.api+json",
     ...(authHeaders ?? {}),
+  }
+
+  const proxySecret = process.env.DRUPAL_PROXY_SECRET
+  if (proxySecret && proxySecret.trim() !== "") {
+    headers["X-Proxy-Secret"] = proxySecret.trim()
   }
 
   const res = await fetch(
