@@ -124,6 +124,14 @@ function isDrupalOnlyPath(path: string): boolean {
   })
 }
 
+function isSafeProxyPath(path: string): boolean {
+  if (typeof path !== "string") return false
+  if (path.length === 0 || path.length > 2048) return false
+  if (!path.startsWith("/") || path.startsWith("//")) return false
+  if (path.includes("\0") || path.includes("\\") || path.includes("..")) return false
+  return true
+}
+
 /**
  * Resolve a path via the jsonapi_frontend resolver.
  */
@@ -182,7 +190,7 @@ async function proxyToDrupal(request: NextRequest, path: string): Promise<NextRe
     return NextResponse.next()
   }
 
-  if (!path.startsWith("/")) {
+  if (!isSafeProxyPath(path)) {
     return NextResponse.next()
   }
 
