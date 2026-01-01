@@ -115,7 +115,7 @@ Render: <NodePage entity={...} included={...} />
 | `DRUPAL_ORIGIN_URL` | Next.js First | Drupal origin for proxying |
 | `DRUPAL_PROXY_SECRET` | Next.js First | Shared secret from Drupal admin |
 | `REVALIDATION_SECRET` | Production | Secret for cache revalidation webhooks |
-| `DRUPAL_IMAGE_DOMAIN` | Recommended | Restrict image sources for security |
+| `DRUPAL_IMAGE_DOMAIN` | Recommended | Restrict image sources (defaults to `DRUPAL_BASE_URL` host) |
 | `DRUPAL_JWT_TOKEN` | Optional | Server-side JWT token for Drupal auth |
 | `DRUPAL_BASIC_USERNAME` | Optional | Server-side Basic auth username |
 | `DRUPAL_BASIC_PASSWORD` | Optional | Server-side Basic auth password |
@@ -130,6 +130,11 @@ If your Drupal JSON:API requires auth, set one of these in `.env.local` (server-
 - `DRUPAL_JWT_TOKEN`
 
 When auth is configured, this starter disables Next.js fetch caching to avoid leaking access-controlled content across users.
+
+## Security notes
+
+- In production, do not allow wildcard image domains. Set `DRUPAL_IMAGE_DOMAIN` (or rely on `DRUPAL_BASE_URL` if images come from the same host).
+- Non-headless redirects are validated to only go to your configured Drupal origin (avoids open-redirect footguns).
 
 ## Deployment Modes
 
@@ -324,13 +329,13 @@ $settings['cors'] = [
   'enabled' => TRUE,
   'allowedOrigins' => ['https://your-nextjs-site.com'],
   'allowedMethods' => ['GET'],
-  'allowedHeaders' => ['Content-Type', 'Accept'],
+  'allowedHeaders' => ['Content-Type', 'Accept', 'Authorization'],
 ];
 ```
 
 ## License
 
-MIT
+GPL-2.0-or-later
 
 ## Related
 

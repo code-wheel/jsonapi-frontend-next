@@ -21,6 +21,7 @@ import type { NextRequest } from "next/server"
 // Paths that should always go to Drupal (never handled by Next.js)
 const DRUPAL_ONLY_PATHS = [
   // Drupal asset paths (required when proxying Drupal HTML)
+  "/jsonapi",
   "/core",
   "/modules",
   "/themes",
@@ -46,6 +47,7 @@ const NEXTJS_ONLY_PATHS = ["/_next", "/api", "/favicon.ico", "/robots.txt", "/si
 const FORWARD_REQUEST_HEADERS = [
   "accept",
   "accept-language",
+  "authorization",
   "content-type",
   "cookie",
   "x-requested-with",

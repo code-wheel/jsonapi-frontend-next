@@ -25,11 +25,35 @@ interface RevalidatePayload {
   timestamp: number
 }
 
+const MAX_REVALIDATE_ITEMS = 50
+
 function serializeError(error: unknown): { message: string; name?: string; stack?: string } {
   if (error instanceof Error) {
     return { name: error.name, message: error.message, stack: error.stack }
   }
   return { message: String(error) }
+}
+
+function normalizeRevalidatePath(value: unknown): string | null {
+  if (typeof value !== "string") return null
+
+  const path = value.trim()
+  if (path === "" || path.length > 2048) return null
+  if (!path.startsWith("/") || path.startsWith("//")) return null
+  if (path.includes("?") || path.includes("#")) return null
+  if (path.includes("\0") || path.includes("\\") || path.includes("..")) return null
+
+  return path
+}
+
+function normalizeRevalidateTag(value: unknown): string | null {
+  if (typeof value !== "string") return null
+
+  const tag = value.trim()
+  if (tag === "" || tag.length > 200) return null
+  if (!/^[a-zA-Z0-9:_-]+$/.test(tag)) return null
+
+  return tag
 }
 
 /**
@@ -73,9 +97,12 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  const { paths = [], tags = [], operation, entity } = payload
+  const operation = payload.operation
+  const entity = payload.entity
+  const rawPaths = Array.isArray(payload.paths) ? payload.paths : []
+  const rawTags = Array.isArray(payload.tags) ? payload.tags : []
 
-  if (paths.length === 0 && tags.length === 0) {
+  if (rawPaths.length === 0 && rawTags.length === 0) {
     return NextResponse.json(
       { error: "No paths or tags provided" },
       { status: 400 }
@@ -89,7 +116,10 @@ export async function POST(request: NextRequest) {
   }
 
   // Revalidate by cache tags (more efficient, surgical invalidation)
-  for (const tag of tags) {
+  for (const rawTag of rawTags.slice(0, MAX_REVALIDATE_ITEMS)) {
+    const tag = normalizeRevalidateTag(rawTag)
+    if (!tag) continue
+
     try {
       revalidateTag(tag, "max")
       revalidated.tags.push(tag)
@@ -103,7 +133,10 @@ export async function POST(request: NextRequest) {
   }
 
   // Revalidate by paths (fallback, less efficient but more direct)
-  for (const path of paths) {
+  for (const rawPath of rawPaths.slice(0, MAX_REVALIDATE_ITEMS)) {
+    const path = normalizeRevalidatePath(rawPath)
+    if (!path) continue
+
     try {
       revalidatePath(path)
       revalidated.paths.push(path)

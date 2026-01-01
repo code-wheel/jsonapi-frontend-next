@@ -76,7 +76,11 @@ export default async function Page({ params, searchParams }: PageProps) {
 
   // Handle non-headless content (entities or views): redirect to Drupal
   if (!resolved.headless && resolved.drupal_url) {
-    redirect(resolved.drupal_url)
+    const safe = getSafeDrupalRedirectUrl(resolved.drupal_url, drupalBaseUrl)
+    if (safe) {
+      redirect(safe)
+    }
+    notFound()
   }
 
   // Handle views (headless)
@@ -164,4 +168,20 @@ function slugToPath(slug: string[] | string | undefined): string {
     return "/" + slug
   }
   return "/"
+}
+
+function getSafeDrupalRedirectUrl(drupalUrl: string, drupalBaseUrl: string): string | null {
+  let allowedOrigin: string
+  try {
+    allowedOrigin = new URL(drupalBaseUrl).origin
+  } catch {
+    return null
+  }
+
+  try {
+    const target = new URL(drupalUrl, allowedOrigin)
+    return target.origin === allowedOrigin ? target.toString() : null
+  } catch {
+    return null
+  }
 }

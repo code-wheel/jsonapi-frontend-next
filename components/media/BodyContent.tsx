@@ -217,7 +217,7 @@ function renderWithEmbeddedMedia(
             />
             {caption && (
               <figcaption className="text-sm text-gray-600 mt-2 text-center">
-                {decodeHtmlEntities(caption)}
+                {caption}
               </figcaption>
             )}
           </figure>
@@ -236,45 +236,5 @@ function renderWithEmbeddedMedia(
     }
 
     return null
-  })
-}
-
-/**
- * Decode HTML entities in a string.
- */
-function decodeHtmlEntities(text: string): string {
-  return text.replace(/&(#x[0-9a-fA-F]+|#\d+|[a-zA-Z]+);/g, (match, entity) => {
-    if (entity[0] === "#") {
-      const codePoint =
-        entity[1]?.toLowerCase() === "x"
-          ? Number.parseInt(entity.slice(2), 16)
-          : Number.parseInt(entity.slice(1), 10)
-
-      if (Number.isFinite(codePoint)) {
-        try {
-          return String.fromCodePoint(codePoint)
-        } catch {
-          return match
-        }
-      }
-      return match
-    }
-
-    switch (entity) {
-      case "amp":
-        return "&"
-      case "lt":
-        return "<"
-      case "gt":
-        return ">"
-      case "quot":
-        return "\""
-      case "apos":
-        return "'"
-      case "nbsp":
-        return "\u00A0"
-      default:
-        return match
-    }
   })
 }
