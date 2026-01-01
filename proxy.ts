@@ -20,6 +20,13 @@ import type { NextRequest } from "next/server"
 
 // Paths that should always go to Drupal (never handled by Next.js)
 const DRUPAL_ONLY_PATHS = [
+  // Drupal asset paths (required when proxying Drupal HTML)
+  "/core",
+  "/modules",
+  "/themes",
+  "/sites",
+  "/libraries",
+
   "/admin",
   "/user",
   "/node/add",
