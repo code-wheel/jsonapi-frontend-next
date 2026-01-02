@@ -1,16 +1,8 @@
 # jsonapi-frontend-next
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/code-wheel/jsonapi-frontend-next&env=DRUPAL_BASE_URL&envDescription=Drupal%20site%20URL%20(example%3A%20https%3A%2F%2Fwww.example.com)&envLink=https%3A%2F%2Fgithub.com%2Fcode-wheel%2Fjsonapi-frontend-next%2Fblob%2Fmaster%2F.env.example)
-
 Next.js starter template for Drupal JSON:API with [jsonapi_frontend](https://www.drupal.org/project/jsonapi_frontend).
 
 **Zero to rendering Drupal content in under 30 minutes.**
-
-## One-click deploy (free)
-
-### Vercel
-
-Click the button above, set `DRUPAL_BASE_URL`, and deploy.
 
 ## Quick Start
 
@@ -60,6 +52,7 @@ Open [http://localhost:3000](http://localhost:3000) and navigate to any path tha
 - **HTML sanitization** (XSS protection)
 - SEO-friendly metadata
 - Two deployment modes (Split Routing or Next.js First)
+- Optional Layout Builder tree rendering (via `jsonapi_frontend_layout`)
 
 ## Prerequisites
 
@@ -74,7 +67,7 @@ Open [http://localhost:3000](http://localhost:3000) and navigate to any path tha
 ```
 Request: /about-us
     ↓
-Resolver: GET /jsonapi/resolve?path=/about-us&_format=json
+Resolver: GET /jsonapi/layout/resolve?path=/about-us&_format=json (falls back to /jsonapi/resolve)
     ↓
 Response: { kind: "entity", jsonapi_url: "/jsonapi/node/page/...", headless: true }
     ↓
@@ -82,6 +75,20 @@ Fetch: GET /jsonapi/node/page/...?include=field_image,field_media...
     ↓
 Render: <NodePage entity={...} included={...} />
 ```
+
+## Layout Builder (optional)
+
+If you use Drupal Layout Builder and want true headless rendering, install the add-on module:
+
+- Drupal: https://www.drupal.org/project/jsonapi_frontend_layout
+
+This starter will then use:
+
+```
+GET /jsonapi/layout/resolve?path=/about-us&_format=json
+```
+
+When the resolved entity is rendered with Layout Builder, the response includes a `layout` tree. The starter renders a minimal layout tree (field blocks + inline blocks) and falls back to the normal entity renderer for everything else.
 
 ## Project Structure
 
@@ -343,7 +350,7 @@ $settings['cors'] = [
 
 ## License
 
-GPL-2.0-or-later
+MIT
 
 ## Related
 

@@ -1,5 +1,6 @@
-import { resolvePath, fetchJsonApi } from "@/lib/drupal"
+import { resolvePathWithLayout, fetchJsonApi } from "@/lib/drupal"
 import { EntityRenderer } from "@/components/entity"
+import { LayoutBuilderRenderer } from "@/components/layout/LayoutBuilderRenderer"
 
 /**
  * Homepage - resolves the root path "/" from Drupal.
@@ -12,7 +13,7 @@ export default async function HomePage() {
     return <WelcomePage />
   }
 
-  const resolved = await resolvePath("/")
+  const resolved = await resolvePathWithLayout("/")
 
   if (!resolved.resolved) {
     // No front page configured in Drupal - show a welcome message
@@ -21,6 +22,10 @@ export default async function HomePage() {
 
   if (resolved.kind === "entity" && resolved.jsonapi_url) {
     const doc = await fetchJsonApi(resolved.jsonapi_url)
+    if ("layout" in resolved && resolved.layout) {
+      return <LayoutBuilderRenderer layout={resolved.layout} doc={doc} />
+    }
+
     return <EntityRenderer doc={doc} />
   }
 

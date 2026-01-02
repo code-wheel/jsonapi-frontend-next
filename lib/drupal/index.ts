@@ -1,5 +1,5 @@
 // Core functionality
-export { resolvePath } from "./resolve"
+export { resolvePath, resolvePathWithLayout } from "./resolve"
 export { fetchJsonApi, fetchView } from "./fetch"
 
 // URL utilities
@@ -26,6 +26,10 @@ export {
 // Types
 export type {
   ResolveResponse,
+  LayoutResolveResponse,
+  LayoutTree,
+  LayoutSection,
+  LayoutComponent,
   JsonApiDocument,
   JsonApiResource,
   JsonApiRelationship,

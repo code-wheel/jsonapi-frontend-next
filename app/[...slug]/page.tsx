@@ -1,7 +1,8 @@
 import { notFound, permanentRedirect, redirect } from "next/navigation"
-import { resolvePath, fetchJsonApi, fetchView } from "@/lib/drupal"
+import { resolvePathWithLayout, fetchJsonApi, fetchView } from "@/lib/drupal"
 import { EntityRenderer } from "@/components/entity"
 import { ViewRenderer } from "@/components/view"
+import { LayoutBuilderRenderer } from "@/components/layout/LayoutBuilderRenderer"
 
 interface PageProps {
   // Next.js 16+ passes `params` / `searchParams` as Promises.
@@ -62,7 +63,7 @@ export default async function Page({ params, searchParams }: PageProps) {
   const query = searchParamsToString(await searchParams)
 
   // Resolve the path to a Drupal resource
-  const resolved = await resolvePath(path)
+  const resolved = await resolvePathWithLayout(path)
 
   // Handle not found
   if (!resolved.resolved) {
@@ -99,6 +100,10 @@ export default async function Page({ params, searchParams }: PageProps) {
       // Include media relationships for embedded content
       include: DEFAULT_INCLUDES,
     })
+    if ("layout" in resolved && resolved.layout) {
+      return <LayoutBuilderRenderer layout={resolved.layout} doc={doc} />
+    }
+
     return <EntityRenderer doc={doc} />
   }
 
@@ -114,7 +119,7 @@ export async function generateMetadata({ params }: PageProps) {
   const path = slugToPath(resolvedParams?.slug)
 
   try {
-    const resolved = await resolvePath(path)
+    const resolved = await resolvePathWithLayout(path)
 
     if (!resolved.resolved || resolved.kind !== "entity" || !resolved.jsonapi_url) {
       return {}
