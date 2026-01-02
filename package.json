@@ -17,13 +17,13 @@
   "dependencies": {
     "isomorphic-dompurify": "^2.0.0",
     "next": "^16.1.1",
-    "react": "^18.2.0",
+    "react": "^19.2.3",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@types/dompurify": "^3.0.0",
     "@types/node": "^20.0.0",
-    "@types/react": "^18.2.0",
+    "@types/react": "^19.2.7",
     "@types/react-dom": "^18.2.0",
     "autoprefixer": "^10.4.0",
     "eslint": "^9.39.2",
