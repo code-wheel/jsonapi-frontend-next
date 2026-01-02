@@ -1,8 +1,16 @@
 # jsonapi-frontend-next
 
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/code-wheel/jsonapi-frontend-next&env=DRUPAL_BASE_URL&envDescription=Drupal%20site%20URL%20(example%3A%20https%3A%2F%2Fwww.example.com)&envLink=https%3A%2F%2Fgithub.com%2Fcode-wheel%2Fjsonapi-frontend-next%2Fblob%2Fmaster%2F.env.example)
+
 Next.js starter template for Drupal JSON:API with [jsonapi_frontend](https://www.drupal.org/project/jsonapi_frontend).
 
 **Zero to rendering Drupal content in under 30 minutes.**
+
+## One-click deploy (free)
+
+### Vercel
+
+Click the button above, set `DRUPAL_BASE_URL`, and deploy.
 
 ## Quick Start
 
