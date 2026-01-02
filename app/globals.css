@@ -1,56 +1,56 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 /* Prose styles for rendered HTML content */
-.prose {
-  @apply text-gray-800;
-}
+@layer base {
+  .prose {
+    @apply text-gray-800;
+  }
 
-.prose h1 {
-  @apply text-3xl font-bold mt-8 mb-4;
-}
+  .prose h1 {
+    @apply text-3xl font-bold mt-8 mb-4;
+  }
 
-.prose h2 {
-  @apply text-2xl font-bold mt-6 mb-3;
-}
+  .prose h2 {
+    @apply text-2xl font-bold mt-6 mb-3;
+  }
 
-.prose h3 {
-  @apply text-xl font-semibold mt-4 mb-2;
-}
+  .prose h3 {
+    @apply text-xl font-semibold mt-4 mb-2;
+  }
 
-.prose p {
-  @apply mb-4 leading-relaxed;
-}
+  .prose p {
+    @apply mb-4 leading-relaxed;
+  }
 
-.prose a {
-  @apply text-blue-600 hover:underline;
-}
+  .prose a {
+    @apply text-blue-600 hover:underline;
+  }
 
-.prose ul {
-  @apply list-disc list-inside mb-4;
-}
+  .prose ul {
+    @apply list-disc list-inside mb-4;
+  }
 
-.prose ol {
-  @apply list-decimal list-inside mb-4;
-}
+  .prose ol {
+    @apply list-decimal list-inside mb-4;
+  }
 
-.prose li {
-  @apply mb-1;
-}
+  .prose li {
+    @apply mb-1;
+  }
 
-.prose blockquote {
-  @apply border-l-4 border-gray-300 pl-4 italic my-4;
-}
+  .prose blockquote {
+    @apply border-l-4 border-gray-300 pl-4 italic my-4;
+  }
 
-.prose pre {
-  @apply bg-gray-100 p-4 rounded overflow-auto my-4;
-}
+  .prose pre {
+    @apply bg-gray-100 p-4 rounded overflow-auto my-4;
+  }
 
-.prose code {
-  @apply bg-gray-100 px-1 rounded text-sm;
-}
+  .prose code {
+    @apply bg-gray-100 px-1 rounded text-sm;
+  }
 
-.prose img {
-  @apply max-w-full h-auto my-4;
+  .prose img {
+    @apply max-w-full h-auto my-4;
+  }
 }
