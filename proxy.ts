@@ -28,6 +28,10 @@ const DRUPAL_ONLY_PATHS = [
   "/sites",
   "/libraries",
 
+  // Common Drupal routes that should remain on Drupal (e.g., Webform).
+  "/form",
+  "/webform_rest",
+
   "/admin",
   "/user",
   "/node/add",
