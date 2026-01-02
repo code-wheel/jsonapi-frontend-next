@@ -15,7 +15,44 @@ import { DrupalMedia } from "./DrupalMedia"
  * Sanitize HTML to prevent XSS attacks.
  * Allows safe tags and attributes commonly used in rich text.
  */
+let dompurifyHooksInstalled = false
+
+function ensureDomPurifyHooks(): void {
+  if (dompurifyHooksInstalled) return
+
+  DOMPurify.addHook("afterSanitizeAttributes", (node) => {
+    if (!node || typeof node !== "object") return
+
+    const tagName =
+      "tagName" in node && typeof (node as { tagName?: unknown }).tagName === "string"
+        ? (node as { tagName: string }).tagName.toLowerCase()
+        : null
+
+    if (tagName !== "a") return
+
+    const element = node as unknown as Element
+
+    if (element.getAttribute("target") === "_blank") {
+      const relParts = new Set(
+        (element.getAttribute("rel") || "")
+          .split(/\s+/)
+          .map((v) => v.trim())
+          .filter(Boolean)
+      )
+
+      relParts.add("noopener")
+      relParts.add("noreferrer")
+
+      element.setAttribute("rel", Array.from(relParts).join(" "))
+    }
+  })
+
+  dompurifyHooksInstalled = true
+}
+
 function sanitizeHtml(html: string): string {
+  ensureDomPurifyHooks()
+
   return DOMPurify.sanitize(html, {
     ALLOWED_TAGS: [
       "p", "br", "strong", "em", "b", "i", "u", "s",
@@ -34,10 +71,8 @@ function sanitizeHtml(html: string): string {
       "width", "height",
       "colspan", "rowspan",
     ],
-    // Allow data: URLs for inline images (Drupal may use these)
+    // Disallow data-* attributes to avoid leaking config/secrets into markup.
     ALLOW_DATA_ATTR: false,
-    // Add rel="noopener noreferrer" to external links
-    ADD_ATTR: ["target"],
   })
 }
 
