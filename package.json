@@ -12,7 +12,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx --max-warnings 0",
-    "smoke": "node scripts/smoke.mjs"
+    "smoke": "node scripts/smoke.mjs",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "isomorphic-dompurify": "^2.0.0",
@@ -21,6 +22,7 @@
     "react-dom": "^19.2.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.51.1",
     "@tailwindcss/postcss": "^4.1.18",
     "@types/dompurify": "^3.0.0",
     "@types/node": "^22.19.3",

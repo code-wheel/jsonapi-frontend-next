@@ -56,7 +56,7 @@ Open [http://localhost:3000](http://localhost:3000) and navigate to any path tha
 
 ## Prerequisites
 
-- Node.js 20+
+- Node.js 22+
 - A Drupal 10+ site with:
   - `jsonapi_frontend` module enabled
   - JSON:API module enabled (core)

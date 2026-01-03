@@ -82,6 +82,9 @@ export async function fetchJsonApi<T = JsonApiDocument>(
   const url = new URL(jsonapiPath, base)
 
   // Add include parameter for relationships
+  const hasInclude = !!options?.include?.length
+  const hasFields = !!options?.fields && Object.keys(options.fields).length > 0
+
   if (options?.include?.length) {
     url.searchParams.set("include", options.include.join(","))
   }
@@ -124,6 +127,28 @@ export async function fetchJsonApi<T = JsonApiDocument>(
   )
 
   if (!res.ok) {
+    // If the site doesn't have our example include paths, Drupal JSON:API returns
+    // 400 for invalid `include` values. Fall back to a plain fetch so the starter
+    // works out-of-the-box on a fresh Drupal install.
+    if (res.status === 400 && (hasInclude || hasFields)) {
+      const retryUrl = new URL(jsonapiPath, base)
+      const retry = await fetch(
+        retryUrl.toString(),
+        authHeaders
+          ? { cache: "no-store", headers }
+          : {
+              next: {
+                revalidate: options?.revalidate ?? 60,
+                tags,
+              },
+              headers,
+            }
+      )
+      if (retry.ok) {
+        return (await retry.json()) as T
+      }
+    }
+
     throw new Error(`JSON:API fetch failed: ${res.status} ${res.statusText}`)
   }
 
