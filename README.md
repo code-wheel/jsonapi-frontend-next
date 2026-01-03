@@ -1,5 +1,7 @@
 # jsonapi-frontend-next
 
+[![CI](https://github.com/code-wheel/jsonapi-frontend-next/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/code-wheel/jsonapi-frontend-next/actions/workflows/ci.yml?query=branch%3Amaster) [![CodeQL](https://github.com/code-wheel/jsonapi-frontend-next/actions/workflows/codeql.yml/badge.svg?branch=master)](https://github.com/code-wheel/jsonapi-frontend-next/actions/workflows/codeql.yml?query=branch%3Amaster) [![Security Policy](https://img.shields.io/badge/security-policy-blue.svg)](SECURITY.md)
+
 Next.js starter template for Drupal JSON:API with [jsonapi_frontend](https://www.drupal.org/project/jsonapi_frontend).
 
 **Zero to rendering Drupal content in under 30 minutes.**
