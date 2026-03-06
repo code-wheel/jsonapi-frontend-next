@@ -22,15 +22,15 @@
     "react-dom": "^19.2.3"
   },
   "devDependencies": {
-    "@playwright/test": "^1.51.1",
-    "@tailwindcss/postcss": "^4.1.18",
+    "@playwright/test": "^1.58.2",
+    "@tailwindcss/postcss": "^4.2.1",
     "@types/node": "^22.19.3",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
-    "autoprefixer": "^10.4.0",
+    "autoprefixer": "^10.4.27",
     "eslint": "^9.39.2",
-    "eslint-config-next": "^16.1.1",
-    "postcss": "^8.4.0",
+    "eslint-config-next": "^16.1.6",
+    "postcss": "^8.5.8",
     "tailwindcss": "^4.1.18",
     "typescript": "^5.0.0"
   },
