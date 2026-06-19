@@ -32,7 +32,7 @@
     "eslint-config-next": "^16.1.1",
     "postcss": "^8.4.0",
     "tailwindcss": "^4.1.18",
-    "typescript": "^5.0.0"
+    "typescript": "^6.0.3"
   },
   "overrides": {
     "@next/eslint-plugin-next": {
